@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "fs": "^0.0.1-security",
+    "js-yaml": "^4.1.0",
+    "kafkajs": "^2.2.1",
+    "protobufjs": "^7.1.2",
+    "semver": "^7.3.8"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.2"
+  }
+}
