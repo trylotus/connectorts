@@ -1,6 +1,6 @@
-const yaml = require('js-yaml')
-const fs = require('fs')
 import { Env } from '../kafkautils/types'
+import { load } from 'js-yaml'
+import { existsSync, readFileSync } from 'fs'
 
 interface IKafka {
     env: Env
@@ -59,7 +59,7 @@ function setConfigDefaults() {
 function setupExternalConfig(dir?: string) {
     if (!dir) return
     try {
-        config = yaml.load(fs.readFileSync(dir, 'utf8'));
+        config = load(readFileSync(dir, 'utf8'));
     } catch (e) {
         console.log(e);
     }
@@ -101,7 +101,7 @@ function _init(): void {
 
     for (let f of paths) {
         let filepath = f + "/" + configFileName + ".yaml"
-        if (fs.existsSync(filepath)) {
+        if (existsSync(filepath)) {
             setupExternalConfig(filepath)
             try {
                 validateConfig(config)
