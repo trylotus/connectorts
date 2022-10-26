@@ -1,6 +1,6 @@
-import { SemVer } from 'semver/classes/semver'
-import { load } from 'js-yaml'
-import { readFileSync } from 'fs'
+const SemVer = require('semver/classes/semver')
+const yaml = require('js-yaml')
+const fs = require('fs')
 
 export type Manifest = {
     name: string
@@ -13,7 +13,7 @@ export function loadManifest(): Manifest {
 
     let yfile
     try {
-        yfile = load(readFileSync("manifest.yaml", 'utf8'))
+        yfile = yaml.load(fs.readFileSync("manifest.yaml", 'utf8'))
     } catch (e) {
         console.log("failed to open file manifest.yaml. error: " + e)
     }
