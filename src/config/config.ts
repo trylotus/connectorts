@@ -24,15 +24,10 @@ export function getConfig() {
 
 function setConfigDefaults() {
     config = {
+        "debug": false,
         "kafka": {
             "env": Env.DEV,
             "url": ""
-        },
-        "debug": false,
-        "ethereum": {
-            "kafka": {
-                "txID": "ethereum-source"
-            }
         },
         "prometheus": {
             "metrics": {
@@ -41,17 +36,6 @@ function setConfigDefaults() {
         },
         "protoregistry": {
             "host": "localhost:9191"
-        },
-        "streamserver": {
-            "addr": ":8080"
-        },
-        "websocket": {
-            "wcReplicationFactor": 1,
-            "hcReplicationFactor": 1,
-            "coolDownSecond": 30,
-            "lruCacheSize": 128,
-            "allowedBlocksBehind": 3,
-            "maxIdleSecond": 60
         }
     }
 }
