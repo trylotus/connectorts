@@ -99,3 +99,7 @@ function _init(): void {
     // InitLogging(config)
 
 }
+
+export function getPrometheusMetricsPort(): string {
+    return config['prometheus.metrics.port']
+}
