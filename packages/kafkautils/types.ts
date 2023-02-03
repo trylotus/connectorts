@@ -1,5 +1,4 @@
-import { Message, ConsumerConfig } from 'kafkajs'
-import * as proto from 'protobufjs';
+import { ConsumerConfig } from 'kafkajs'
 
 export const CONTEXT_SEPARATOR = "."
 export const CONTRACT_SEPARATOR = "_"
@@ -20,11 +19,6 @@ export enum MsgType {
     CDC = "cdc",
     CMD = "cmd",
     SYS = "sys"
-}
-
-export interface IMessage extends Message {
-    readonly msgType: MsgType
-    readonly protoMsg: proto.Message<Buffer>
 }
 
 export interface ConsumerOptions extends ConsumerConfig {

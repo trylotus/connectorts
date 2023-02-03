@@ -1,6 +1,7 @@
-import { Env, MsgType, CONTEXT_SEPARATOR } from './types'
 const SemVer = require('semver/classes/semver')
-import * as proto from 'protobufjs';
+import { Message } from "@bufbuild/protobuf"
+
+import { Env, MsgType, CONTEXT_SEPARATOR } from './types'
 
 export class Topic {
     readonly env: Env
@@ -9,7 +10,6 @@ export class Topic {
     readonly connectorName: string
     readonly version: typeof SemVer
     readonly eventName: string
-    pb: proto.Type // create an empty protobuf struct instance, filled upon UnmarshalProto
 
     public constructor(
         env: Env,
@@ -17,15 +17,14 @@ export class Topic {
         author: string,
         connectorName: string,
         version: typeof SemVer,
-        pb: proto.Type) {
-
+        pb: Message
+    ) {
         this.env = env
         this.msgType = msgType
         this.author = author
         this.connectorName = connectorName
         this.version = version
-        this.eventName = pb.fullName.replace(".", "_")
-        this.pb = pb
+        this.eventName = pb.getType().typeName.replace(".", "_")
     }
 
     // Schema generates the schema string
@@ -33,7 +32,7 @@ export class Topic {
         return [
             this.author,
             this.connectorName,
-            this.version.toString().replace(".", "_"),
+            this.version?.toString().replaceAll(".", "_"),
             this.eventName].join(CONTEXT_SEPARATOR)
     }
 
