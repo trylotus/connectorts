@@ -1,6 +1,6 @@
 import { TopicTypes } from '../src/client';
 import { buildTopicProtoMsgs } from '../src/client'
-import { MsgType } from '../../kafkautils/types'
+import { MsgType } from '../../kafkautils/src/types'
 import { Mint, Redeem } from './test_pb';
 
 describe('Proto Registry', function () {

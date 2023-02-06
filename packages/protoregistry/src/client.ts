@@ -1,7 +1,7 @@
 import * as http from 'http'
 import * as protobuf from "@bufbuild/protobuf"
 
-import { MsgType } from "../../kafkautils/types"
+import { MsgType } from "../../kafkautils/src/types"
 
 export type TopicTypes = { [tt: string]: protobuf.Message }
 

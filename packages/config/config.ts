@@ -1,4 +1,4 @@
-import { Env } from '../kafkautils/types'
+import { Env } from '../kafkautils/src/types'
 const yaml = require('js-yaml')
 const fs = require('fs')
 
@@ -9,6 +9,7 @@ interface IKafka {
 
 export interface IConfig {
     kafka: IKafka
+    rpcs?: { [key: string]: any }
     [key: string]: any
 }
 
@@ -26,7 +27,7 @@ function setConfigDefaults() {
     config = {
         "debug": false,
         "kafka": {
-            "env": Env.DEV,
+            "env": Env.TEST,
             "url": ""
         },
         "prometheus": {
