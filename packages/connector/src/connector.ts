@@ -1,3 +1,5 @@
+import { Mutex } from 'async-mutex';
+
 import { getConfig, IConfig } from '../../config/config'
 import { loadManifest, Manifest } from './manifest'
 import { Env, MsgType, ConsumerOptions } from '../../kafkautils/src/types'
@@ -23,6 +25,7 @@ export class Connector {
 
     private consumer?: Consumer
     private producer?: Producer
+    private _mutex: Mutex
     // private monitor?: Monitor
 
     protected constructor(config: IConfig, env: Env, kafkaUrl: string, manifest: Manifest, rpcs: any, protoRegistryHost: string) {
@@ -32,6 +35,7 @@ export class Connector {
         this.kafkaUrl = kafkaUrl
         this.protoRegistryHost = protoRegistryHost
         this._rpcs = rpcs
+        this._mutex = new Mutex()
     }
 
     /**
@@ -165,8 +169,10 @@ export class Connector {
     public async produceMessages(msgType: MsgType, messages: protobuf.Message[]) {
         if (!this.producer) await this.startProducer()
 
+        let release = await this._mutex.acquire()
+
         let batch = messages.map(msg => {
-            console.log("NEW MESSAGE: ", this.generateTopicFromProto(msgType, msg).toString())
+            console.log(`delivered message from topic:${this.generateTopicFromProto(msgType, msg).toString()}`)
             return {
                 topic: this.generateTopicFromProto(msgType, msg).toString(),
                 messages: [msg]
@@ -183,6 +189,8 @@ export class Connector {
         } catch (e) {
             await transaction?.abort()
         }
+
+        release()
 
         // this.monitor?.setMetricsForKafkaLastWriteTime()
         // await setMetricsForKafkaLastWriteTime()

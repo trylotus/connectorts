@@ -1,172 +1,113 @@
+import { ethers } from "ethers"
+import { Message } from "@bufbuild/protobuf"
+import { Filter, Provider } from '@ethersproject/abstract-provider';
 
-// // HistoricalEvents queries past blocks for the events emitted by the given contract addresses.
-// // These events are provided in a channel and ready to be consumed by the caller.
-// func HistoricalEvents(ctx context.Context, client *ethclient.Client, addresses []common.Address, fromBlock uint64, toBlock uint64) (<-chan types.Log, error) {
-// 	ch := make(chan types.Log, 1000)
+import { Connector } from '../../../connector/src/connector';
+import { MsgType } from '../../../kafkautils/src/types'
+import { Subscription } from "./subscription";
+import { Contract } from './types';
 
-// 	if fromBlock == toBlock {
-// 		close(ch)
-// 		return ch, nil
-// 	}
+const BLOCK_CHUNK_SIZE = 2000 // Some RPC nodes limit to 2000 but there are also event count and/or response size limitations.
+const INITIAL_BACKOFF_DURATION = 1000 // Initial backoff duration before re-hitting RPC node, 1 second in millisecods
+const MAX_BACKOFF_DURATION = 3600000   // Maximum backoff duration before resetting, 1 hour in milliseconds
 
-// 	if toBlock == 0 {
-// 		var err error
-// 		toBlock, err = client.BlockNumber(ctx)
-// 		if err != nil {
-// 			log.Error().Err(err).Msg("failed to get block number")
-// 			close(ch)
-// 			return ch, err
-// 		}
-// 	}
+export class EthereumConnector {
+    public provider: Provider
+    public connector: Connector
+    public static subscription: Subscription
 
-// 	if fromBlock >= toBlock {
-// 		close(ch)
-// 		return ch, nil
-// 	}
+    public constructor(URL: string) {
+        this.connector = Connector.create()
+        this.provider = new ethers.providers.WebSocketProvider(URL)
+    }
 
-// 	go func(logs chan types.Log) {
-// 		defer close(logs)
+    public static create(URL: string): EthereumConnector {
+        let conn = new EthereumConnector(URL)
+        this.subscription = new Subscription(conn)
+        return conn
+    }
 
-// 		//	Store failed queries for retry
-// 		failedQueries, err := ChunkedFilterLogs(ctx, client, addresses, fromBlock, toBlock, logs, nil)
-// 		if err != nil {
-// 			log.Warn().Err(err).Uint64("from", fromBlock).Uint64("to", toBlock).Msg("some intervals failed during backfill, retying...")
-// 		}
+    public async getBlockTime(blockNumber: number) {
+        let block = await this.provider.getBlock(blockNumber)
+        return block.timestamp
+    }
 
-// 		// Count the number of consecutive failures. Reset the counter after every success.
-// 		// If fail 2 times consecutively, start doing exponential backoff before retrying again.
-// 		failCount := 0
+    /**
+     * backfillEvents queries past blocks for the events emitted by the given contract addresses.
+     * These events are then fed into the given parser function and then pushed to Kafka.
+     * @param contracts smart contracts to be queried for events
+     * @param fromBlock starting block number
+     * @param toBlock last block number
+     * @param backoff wait period before making the call
+     */
+    public async backfillEvents(contracts: Contract[], fromBlock: number, toBlock: number, backoff: number) {
+        console.log(`backfill from ${fromBlock} to ${toBlock}`)
 
-// 		for len(failedQueries) > 0 {
-// 			// Get a failed query from the beginning of the queue
-// 			q := failedQueries[0]
-// 			failedQueries = failedQueries[1:]
+        if (backoff < INITIAL_BACKOFF_DURATION || backoff > MAX_BACKOFF_DURATION) {
+            backoff = INITIAL_BACKOFF_DURATION
+        }
 
-// 			fq, err := ChunkedFilterLogs(ctx, client, q.Addresses, q.FromBlock.Uint64(), q.ToBlock.Uint64(), logs, nil)
-// 			if err != nil {
-// 				log.Warn().Err(err).Uint64("from", q.FromBlock.Uint64()).Uint64("to", q.ToBlock.Uint64()).Msg("some intervals failed during backfill, retrying...")
-// 			}
+        setTimeout
+        if (toBlock - fromBlock > BLOCK_CHUNK_SIZE) {
+            await this.backfillEvents(contracts, fromBlock, fromBlock + BLOCK_CHUNK_SIZE, backoff)
+            await this.backfillEvents(contracts, fromBlock + BLOCK_CHUNK_SIZE, toBlock, backoff)
+            return
+        }
 
-// 			if len(fq) > 0 {
-// 				// Put failed queries to the end of the queue to retry later
-// 				failedQueries = append(failedQueries, fq...)
-// 				failCount++
-// 			} else {
-// 				failCount = 0
-// 			}
+        for (let contract of contracts) {
 
-// 			if failCount >= 2 {
-// 				// After first failure, do exponential backoff with 10% jitter
-// 				backoff := float64(int(1) << (failCount - 2))
-// 				backoff += backoff * (0.1 * rand.Float64())
-// 				select {
-// 				case <-ctx.Done():
-// 					for _, fq := range failedQueries {
-// 						log.Error().Err(ctx.Err()).Uint64("from", fq.FromBlock.Uint64()).Uint64("to", fq.ToBlock.Uint64()).Msg("aborting failed backfill interval")
-// 					}
-// 					return
-// 				case <-time.After(time.Second * time.Duration(backoff)):
-// 					continue
-// 				}
-// 			}
-// 		}
-// 	}(ch)
+            let filter: Filter = {
+                address: contract.address,
+                fromBlock: fromBlock,
+                toBlock: toBlock,
+            }
 
-// 	return ch, nil
-// }
+            try {
+                let logs = await this.provider.getLogs(filter)
 
-// // HistoricalEventsWithQueryParams queries past blocks for the events emitted by the given contract addresses.
-// // These events are provided in a channel and ready to be consumed by the caller.
-// // * fromBlock > 0 && numBlocks > 0 => Backfill from fromBlock to fromBlock+numBlocks
-// // * fromBlock > 0 && numBlocks = 0 => Backfill from fromBlock to current latest block
-// // * fromBlock = 0 && numBlocks > 0 => Backfill last numBlocks blocks
-// func HistoricalEventsWithQueryParams(ctx context.Context, client *ethclient.Client, addresses []common.Address, fromBlock uint64, numBlocks uint64) (<-chan types.Log, error) {
-// 	switch {
-// 	case fromBlock > 0 && numBlocks > 0:
-// 		return HistoricalEvents(ctx, client, addresses, fromBlock, fromBlock+numBlocks)
-// 	case fromBlock > 0 && numBlocks == 0:
-// 		return HistoricalEvents(ctx, client, addresses, fromBlock, 0)
-// 	case fromBlock == 0 && numBlocks > 0:
-// 		toBlock, err := client.BlockNumber(ctx)
-// 		if err != nil {
-// 			log.Error().Err(err).Msg("failed to get block number")
-// 			ch := make(chan types.Log)
-// 			close(ch)
-// 			return ch, err
-// 		}
-// 		return HistoricalEvents(ctx, client, addresses, toBlock-numBlocks, toBlock)
-// 	default:
-// 		ch := make(chan types.Log)
-// 		close(ch)
-// 		return ch, nil
-// 	}
-// }
+                let blockNumber = 0
+                let messages: Message[] = []
 
+                for (let vLog of logs) {
+                    let ts = await this.getBlockTime(vLog.blockNumber)
 
-// // ChunkedFilterLogs queries the blockchain for past events in batches.
-// // It slices addresses and total number of blocks with pre-defined batch size.
-// // The results are later fed into a log chan that was provided by the caller.
-// // Failed query intervals are fed into another channel to allow the caller to retry later.
-// func ChunkedFilterLogs(ctx context.Context, client ETHClient, addresses []common.Address, fromBlock, toBlock uint64, logChan chan<- types.Log, failedQueries []ethereum.FilterQuery) ([]ethereum.FilterQuery, error) {
-// 	var err error
+                    let msg = contract.parser(vLog, ts)
 
-// 	if failedQueries == nil {
-// 		failedQueries = make([]ethereum.FilterQuery, 0)
-// 	}
+                    messages.push(msg)
+                    if (blockNumber != vLog.blockNumber) {
+                        this.connector.produceMessages(MsgType.BF, messages)
+                        blockNumber = vLog.blockNumber
+                        messages = []
+                    }
+                }
+            } catch (e) {
+                console.log("call failed, retrying interval. error:" + JSON.stringify(e))
+                let mid = (fromBlock + toBlock) / 2
+                setTimeout(async () => { await this.backfillEvents(contracts, fromBlock, mid, backoff << 1) }, backoff)
+                setTimeout(async () => { await this.backfillEvents(contracts, mid, toBlock, backoff << 1) }, backoff)
+                return
+            }
+        }
+    }
 
-// 	if len(addresses) > addressChunkSize {
-// 		failedQueries, err = ChunkedFilterLogs(ctx, client, addresses[:addressChunkSize], fromBlock, toBlock, logChan, failedQueries)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		return ChunkedFilterLogs(ctx, client, addresses[addressChunkSize:], fromBlock, toBlock, logChan, failedQueries)
-// 	}
+    /**
+     * backfillEventsWithQueryParams determines block interval from query params and calls {@link backfillEvents}.
+     * fromBlock > 0 && numBlocks > 0 => Backfill from fromBlock to fromBlock+numBlocks
+     * fromBlock > 0 && numBlocks = 0 => Backfill from fromBlock to current latest block
+     * fromBlock = 0 && numBlocks > 0 => Backfill last numBlocks blocks
+     * @param contracts smart contracts to be queried for events
+     * @param fromBlock starting block number
+     * @param numBlocks number of blocks to process
+     */
+    public async backfillEventsWithQueryParams(contracts: Contract[], fromBlock: number, numBlocks: number) {
+        let toBlock = await this.provider.getBlockNumber()
 
-// 	if toBlock-fromBlock > blockChunkSize {
-// 		failedQueries, err = ChunkedFilterLogs(ctx, client, addresses, toBlock-blockChunkSize, toBlock, logChan, failedQueries)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		return ChunkedFilterLogs(ctx, client, addresses, fromBlock, toBlock-blockChunkSize-1, logChan, failedQueries)
-// 	}
+        if (fromBlock > 0 && numBlocks > 0 && fromBlock + numBlocks < toBlock) {
+            toBlock = fromBlock + numBlocks
+        } else if (fromBlock == 0 && numBlocks > 0) {
+            fromBlock = toBlock - numBlocks
+        }
 
-// 	log.Debug().Uint64("from", fromBlock).Uint64("to", toBlock).Msg("retrieving historical events...")
-
-// 	query := ethereum.FilterQuery{
-// 		FromBlock: big.NewInt(int64(fromBlock)),
-// 		ToBlock:   big.NewInt(int64(toBlock)),
-// 		Addresses: addresses,
-// 	}
-
-// 	logs, err := client.FilterLogs(ctx, query)
-// 	if err != nil {
-// 		if strings.Contains(err.Error(), "read limit") {
-// 			// error -> websocket: read limit exceeded
-
-// 			log.Error().Err(err).Msg("hit RPC rate limit")
-// 			return nil, err
-// 		}
-// 		log.Warn().Err(err).Uint64("from", fromBlock).Uint64("to", toBlock).Msg("skipping failed backfill interval...")
-
-// 		// Node providers may refuse the request if they deem it too large.
-// 		// It could be block range, number of events or just response size.
-// 		// Here, the call is divided into two, so that it can go through.
-// 		// If the problem is with some specific block range,
-// 		// this will also process the good blocks in a binary search fashion.
-// 		mid := (query.FromBlock.Uint64() + query.ToBlock.Uint64()) / 2
-
-// 		q1 := query
-// 		q1.ToBlock = big.NewInt(int64(mid))
-// 		failedQueries = append(failedQueries, q1)
-
-// 		q2 := query
-// 		q2.FromBlock = big.NewInt(int64(mid))
-// 		failedQueries = append(failedQueries, q2)
-// 	}
-
-// 	for _, l := range logs {
-// 		logChan <- l
-// 	}
-
-// 	return failedQueries, nil
-// }
+        await this.backfillEvents(contracts, fromBlock, toBlock, 0)
+    }
+}

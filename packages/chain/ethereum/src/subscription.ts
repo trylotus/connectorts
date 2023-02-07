@@ -1,32 +1,17 @@
-import { Mutex } from 'async-mutex';
-import { Provider } from '@ethersproject/abstract-provider';
 import { Message } from "@bufbuild/protobuf"
 
 import { MsgType } from '../../../kafkautils/src/types'
-import { Connector } from '../../../connector/src/connector';
+import { EthereumConnector } from './ethereum';
 import { Contract } from './types'
 
 export class Subscription {
-    private _provider: Provider
-    protected _connector: Connector
+    private _conn: EthereumConnector
 
-    private constructor(provider: Provider, connector: Connector) {
-        this._provider = provider
-        this._connector = connector
-    }
-
-    public static create(provider: Provider, connector: Connector): Subscription {
-        let subscription = new Subscription(provider, connector)
-        return subscription
-    }
-
-    public async getBlockTime(blockNumber: number) {
-        let block = await this._provider.getBlock(blockNumber)
-        return block.timestamp
+    public constructor(conn: EthereumConnector) {
+        this._conn = conn
     }
 
     public subscribe(contracts: Contract[]) {
-        const mutex = new Mutex()
         let blockNumber = 0
         let messages: Message[] = []
 
@@ -35,25 +20,19 @@ export class Subscription {
                 address: contract.address
             }
 
-            this._provider.on(filter, async (vLog) => {
-                let ts = await this.getBlockTime(vLog.blockNumber)
+            this._conn.provider.on(filter, async (vLog) => {
+                let ts = await this._conn.getBlockTime(vLog.blockNumber)
 
                 let msg = contract.parser(vLog, ts)
 
-                let release = await mutex.acquire()
-
                 messages.push(msg)
                 if (blockNumber != vLog.blockNumber) {
-                    this._connector.produceMessages(MsgType.FCT, messages)
+                    this._conn.connector.produceMessages(MsgType.FCT, messages)
                     blockNumber = vLog.blockNumber
                     messages = []
                 }
-
-                release()
             })
-
         }
-
     }
 }
 
