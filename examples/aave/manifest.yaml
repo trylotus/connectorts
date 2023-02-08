@@ -1,0 +1,7 @@
+name: aave
+author: nakji
+version: "0.0.0"
+
+outputPath: aave
+package: aave
+owner: nakji

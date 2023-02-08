@@ -1,0 +1,149 @@
+// Code generated - DO NOT EDIT.
+// This file is a generated protobuf definition and any manual changes will be lost.
+
+syntax = "proto3";
+package nakji.aave.lendingpool;
+
+import "google/protobuf/timestamp.proto";
+option go_package = "github.com/nakji-network/connectorjs/examples/aave/lendingpool";
+
+
+message Borrow {
+	google.protobuf.Timestamp ts = 1;
+	bytes reserve = 2; 
+	bytes user = 3; 
+	bytes onBehalfOf = 4; 
+	bytes amount = 5; // uint256
+	bytes borrowRateMode = 6; // uint256
+	bytes borrowRate = 7; // uint256
+	uint32 referral = 8; 
+	uint64 blockNumber = 9;
+	uint64 logIndex = 10;
+	string txHash = 11;
+
+}
+
+message Deposit {
+	google.protobuf.Timestamp ts = 1;
+	bytes reserve = 2; 
+	bytes user = 3; 
+	bytes onBehalfOf = 4; 
+	bytes amount = 5; // uint256
+	uint32 referral = 6; 
+	uint64 blockNumber = 7;
+	uint64 logIndex = 8;
+	string txHash = 9;
+}
+
+message RebalanceStableBorrowRate {
+	google.protobuf.Timestamp ts = 1;
+	bytes reserve = 2; 
+	bytes user = 3; 
+	uint64 blockNumber = 4;
+	uint64 logIndex = 5;
+	string txHash = 6;
+}
+
+message ReserveUsedAsCollateralDisabled {
+	google.protobuf.Timestamp ts = 1;
+	bytes reserve = 2; 
+	bytes user = 3; 
+	uint64 blockNumber = 4;
+	uint64 logIndex = 5;
+	string txHash = 6;
+}
+
+message ReserveUsedAsCollateralEnabled {
+	google.protobuf.Timestamp ts = 1;
+	bytes reserve = 2; 
+	bytes user = 3; 
+	uint64 blockNumber = 4;
+	uint64 logIndex = 5;
+	string txHash = 6;
+}
+
+message Withdraw {
+	google.protobuf.Timestamp ts = 1;
+	bytes reserve = 2; 
+	bytes user = 3; 
+	bytes to = 4; 
+	bytes amount = 5; // uint256
+	uint64 blockNumber = 6;
+	uint64 logIndex = 7;
+	string txHash = 8;
+}
+
+message ReserveDataUpdated {
+	google.protobuf.Timestamp ts = 1;
+	bytes reserve = 2; 
+	bytes liquidityRate = 3; // uint256
+	bytes stableBorrowRate = 4; // uint256
+	bytes variableBorrowRate = 5; // uint256
+	bytes liquidityIndex = 6; // uint256
+	bytes variableBorrowIndex = 7; // uint256
+	uint64 blockNumber = 8;
+	uint64 logIndex = 9;
+	string txHash = 10;
+}
+
+message Swap {
+	google.protobuf.Timestamp ts = 1;
+	bytes reserve = 2; 
+	bytes user = 3; 
+	bytes rateMode = 4; // uint256
+	uint64 blockNumber = 5;
+	uint64 logIndex = 6;
+	string txHash = 7;
+}
+
+message Unpaused {
+	google.protobuf.Timestamp ts = 1;
+	uint64 blockNumber = 2;
+	uint64 logIndex = 3;
+	string txHash = 4;
+}
+
+message LiquidationCall {
+	google.protobuf.Timestamp ts = 1;
+	bytes collateralAsset = 2; 
+	bytes debtAsset = 3; 
+	bytes user = 4; 
+	bytes debtToCover = 5; // uint256
+	bytes liquidatedCollateralAmount = 6; // uint256
+	bytes liquidator = 7; 
+	bool receiveAToken = 8; 
+	uint64 blockNumber = 9;
+	uint64 logIndex = 10;
+	string txHash = 11;
+}
+
+message Repay {
+	google.protobuf.Timestamp ts = 1;
+	bytes reserve = 2; 
+	bytes user = 3; 
+	bytes repayer = 4; 
+	bytes amount = 5; // uint256
+	uint64 blockNumber = 6;
+	uint64 logIndex = 7;
+	string txHash = 8;
+}
+
+message FlashLoan {
+	google.protobuf.Timestamp ts = 1;
+	bytes target = 2; 
+	bytes initiator = 3; 
+	bytes asset = 4; 
+	bytes amount = 5; // uint256
+	bytes premium = 6; // uint256
+	uint32 referralCode = 7; 
+	uint64 blockNumber = 8;
+	uint64 logIndex = 9;
+	string txHash = 10;
+}
+
+message Paused {
+	google.protobuf.Timestamp ts = 1;
+	uint64 blockNumber = 2;
+	uint64 logIndex = 3;
+	string txHash = 4;
+}
