@@ -4,7 +4,6 @@ import { Filter, Provider } from '@ethersproject/abstract-provider';
 
 import { Connector } from '../../../connector/src/connector';
 import { MsgType } from '../../../kafkautils/src/types'
-import { Subscription } from "./subscription";
 import { Contract } from './types';
 
 const BLOCK_CHUNK_SIZE = 2000 // Some RPC nodes limit to 2000 but there are also event count and/or response size limitations.
@@ -12,19 +11,22 @@ const INITIAL_BACKOFF_DURATION = 1000 // Initial backoff duration before re-hitt
 const MAX_BACKOFF_DURATION = 3600000   // Maximum backoff duration before resetting, 1 hour in milliseconds
 
 export class EthereumConnector {
-    public provider: Provider
     public connector: Connector
-    public static subscription: Subscription
+    public provider: Provider
 
-    public constructor(URL: string) {
-        this.connector = Connector.create()
+    public constructor(...options: ((c: Connector) => void)[]) {
+        this.connector = Connector.create(...options)
+
+        let URL: string = ''
+
+        for (let rpc of this.connector.RPCs.ethereum.full) {
+            if (rpc.startsWith('ws')) {
+                URL = rpc
+                break
+            }
+        }
+
         this.provider = new ethers.providers.WebSocketProvider(URL)
-    }
-
-    public static create(URL: string): EthereumConnector {
-        let conn = new EthereumConnector(URL)
-        this.subscription = new Subscription(conn)
-        return conn
     }
 
     public async getBlockTime(blockNumber: number) {
@@ -41,7 +43,7 @@ export class EthereumConnector {
      * @param backoff wait period before making the call
      */
     public async backfillEvents(contracts: Contract[], fromBlock: number, toBlock: number, backoff: number) {
-        console.log(`backfill from ${fromBlock} to ${toBlock}`)
+        console.log(`retrieving historical events from ${fromBlock} to ${toBlock}...`)
 
         if (backoff < INITIAL_BACKOFF_DURATION || backoff > MAX_BACKOFF_DURATION) {
             backoff = INITIAL_BACKOFF_DURATION
@@ -81,7 +83,7 @@ export class EthereumConnector {
                     }
                 }
             } catch (e) {
-                console.log("call failed, retrying interval. error:" + JSON.stringify(e))
+                console.log(`call failed, retrying after ${backoff / 1000} seconds. error:` + JSON.stringify(e))
                 let mid = (fromBlock + toBlock) / 2
                 setTimeout(async () => { await this.backfillEvents(contracts, fromBlock, mid, backoff << 1) }, backoff)
                 setTimeout(async () => { await this.backfillEvents(contracts, mid, toBlock, backoff << 1) }, backoff)
@@ -99,9 +101,11 @@ export class EthereumConnector {
      * @param fromBlock starting block number
      * @param numBlocks number of blocks to process
      */
-    public async backfillEventsWithQueryParams(contracts: Contract[], fromBlock: number, numBlocks: number) {
-        let toBlock = await this.provider.getBlockNumber()
+    public async backfillEventsWithQueryParams(contracts: Contract[], fromBlock: number | undefined, numBlocks: number | undefined) {
+        if (!fromBlock) fromBlock = 0
+        if (!numBlocks) numBlocks = 0
 
+        let toBlock = await this.provider.getBlockNumber()
         if (fromBlock > 0 && numBlocks > 0 && fromBlock + numBlocks < toBlock) {
             toBlock = fromBlock + numBlocks
         } else if (fromBlock == 0 && numBlocks > 0) {

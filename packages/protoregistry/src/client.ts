@@ -1,15 +1,15 @@
 import * as http from 'http'
-import * as protobuf from "@bufbuild/protobuf"
+import { Message } from "@bufbuild/protobuf"
 
 import { MsgType } from "../../kafkautils/src/types"
 
-export type TopicTypes = { [tt: string]: protobuf.Message }
+export type TopicTypes = { [tt: string]: Message }
 
 type TopicProtoMsg = {
     msg_type: MsgType
     topic: string
     proto_msg: string
-    file_descriptor_proto: protobuf.DescriptorProto
+    file_descriptor_proto: Message
     descriptor: Buffer
 }
 
@@ -64,6 +64,7 @@ export function buildTopicProtoMsgs(topicTypes: TopicTypes, msgType: MsgType): T
             topic: k,
             proto_msg: parseProtoName(k),
             file_descriptor_proto: v,
+            // descriptor: Buffer.from(v.toBinary())
         } as TopicProtoMsg
 
         tpmList.push(tpm)

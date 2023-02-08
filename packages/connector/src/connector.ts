@@ -1,3 +1,5 @@
+import * as protobuf from "@bufbuild/protobuf"
+import * as kafka from 'kafkajs'
 import { Mutex } from 'async-mutex';
 
 import { getConfig, IConfig } from '../../config/config'
@@ -5,36 +7,34 @@ import { loadManifest, Manifest } from './manifest'
 import { Env, MsgType, ConsumerOptions } from '../../kafkautils/src/types'
 import { newConsumer } from '../../kafkautils/src/consumer'
 import { newProducer } from '../../kafkautils/src/producer'
+import { KafkaMessage } from '../../kafkautils/src/message'
 import { Topic } from '../../kafkautils/src/topic'
 import { TopicTypes, registerDynamicTopics } from '../../protoregistry/src/client'
 // import { Monitor } from '../../monitor/src/monitor'
 import { startMonitor } from '../../monitor/src/monitor'
-import * as protobuf from "@bufbuild/protobuf"
 
-
-import { Consumer, Producer, KafkaMessage, ProducerBatch } from 'kafkajs'
 
 
 export class Connector {
     private _config: IConfig
     private env: Env
     private manifest: Manifest
-    private readonly kafkaUrl: string
-    private readonly protoRegistryHost: string
-    private readonly _rpcs: any
-
-    private consumer?: Consumer
-    private producer?: Producer
+    private kafkaUrl: string
+    private protoRegistryHost: string
+    private _RPCs: any
     private _mutex: Mutex
+
+    private consumer?: kafka.Consumer
+    private producer?: kafka.Producer
     // private monitor?: Monitor
 
-    protected constructor(config: IConfig, env: Env, kafkaUrl: string, manifest: Manifest, rpcs: any, protoRegistryHost: string) {
+    private constructor(config: IConfig, env: Env, kafkaUrl: string, manifest: Manifest, rpcs: any, protoRegistryHost: string) {
         this._config = config
         this.env = env
         this.manifest = manifest
         this.kafkaUrl = kafkaUrl
         this.protoRegistryHost = protoRegistryHost
-        this._rpcs = rpcs
+        this._RPCs = rpcs
         this._mutex = new Mutex()
     }
 
@@ -46,13 +46,12 @@ export class Connector {
      */
     public static create(...options: ((c: Connector) => void)[]): Connector {
         let conf = getConfig()
-        let m = loadManifest()
 
         let c = new Connector(
             conf,
             conf.kafka.env,
             conf.kafka.url,
-            m,
+            loadManifest(),
             conf.rpcs,
             conf.protoregistry.host || "http://localhost:9191"
         )
@@ -97,8 +96,8 @@ export class Connector {
         return `${this.manifest.author}-${this.manifest.name}-${this.manifest.version}-${this.env}`
     }
 
-    get rpcs(): any {
-        return this._rpcs
+    get RPCs(): any {
+        return this._RPCs
     }
 
     get config(): IConfig {
@@ -125,11 +124,11 @@ export class Connector {
     }
 
     /**
- * registerProtos generates kafka topic and protobuf type mappings from proto.Message and registers them dynamically.
- * @param msgType kafkautils message type
- * @param protos protocol buffer definitions
- * @returns 
- */
+     * registerProtos generates kafka topic and protobuf type mappings from proto.Message and registers them dynamically.
+     * @param msgType kafkautils message type
+     * @param protos protocol buffer definitions
+     * @returns 
+     */
     public registerProtos(msgType: MsgType, ...protos: protobuf.Message[]): void {
         if (this.env == Env.DEV) {
             console.log("protoregistry is disabled in dev mode, set kafka.env to other values (e.g., test, staging) to enable it")
@@ -138,14 +137,15 @@ export class Connector {
 
         let tts: TopicTypes = {}
         for (let proto of protos) {
-            console.log("tttss: " + this.generateTopicFromProto(msgType, proto).schema())
-            tts[this.generateTopicFromProto(msgType, proto).schema()] = proto
+            let topic = this.generateTopicFromProto(msgType, proto)
+            tts[topic.schema()] = proto
+            console.debug(`registering ${topic.toString()}`)
         }
 
         try {
             registerDynamicTopics(this.protoRegistryHost, tts, msgType)
         } catch (e) {
-            console.log(e)
+            console.error("failed to register topics. error: " + e)
         }
     }
 
@@ -171,22 +171,45 @@ export class Connector {
 
         let release = await this._mutex.acquire()
 
-        let batch = messages.map(msg => {
-            console.log(`delivered message from topic:${this.generateTopicFromProto(msgType, msg).toString()}`)
-            return {
-                topic: this.generateTopicFromProto(msgType, msg).toString(),
-                messages: [msg]
+        type MessageBatch = {
+            [key: string]: kafka.TopicMessages
+        }
+
+        let messageBatch: MessageBatch = {}
+        messages.map(msg => {
+            let topic = this.generateTopicFromProto(msgType, msg).toString()
+            let kafkaMsg = new KafkaMessage(Buffer.from(msg.toBinary()))
+            if (!messageBatch[topic]) {
+                messageBatch[topic] = {
+                    topic: topic,
+                    messages: [kafkaMsg]
+                }
+            } else {
+                messageBatch[topic].messages.push(kafkaMsg)
             }
         })
+
+        let topicMessages: kafka.TopicMessages[] = Object.values(messageBatch).map((item) => {
+            console.debug(`delivered ${item.messages.length} message(s) to topic ${item.topic}`)
+            return {
+                topic: item.topic,
+                messages: item.messages
+            }
+        })
+
+        let producerBatch = {
+            topicMessages: topicMessages
+        }
 
         const transaction = await this.producer?.transaction()
 
         try {
-            await transaction?.sendBatch(batch as ProducerBatch)
+            await transaction?.sendBatch(producerBatch)
             await transaction?.commit()
-            console.log("commited messages ")
+            console.debug("commited messages ")
 
         } catch (e) {
+            console.error("failed to commit messages. error: " + e)
             await transaction?.abort()
         }
 

@@ -5,13 +5,13 @@ import { EthereumConnector } from './ethereum';
 import { Contract } from './types'
 
 export class Subscription {
-    private _conn: EthereumConnector
+    public ethConnector: EthereumConnector
 
-    public constructor(conn: EthereumConnector) {
-        this._conn = conn
+    public constructor() {
+        this.ethConnector = new EthereumConnector()
     }
 
-    public subscribe(contracts: Contract[]) {
+    public subscribeEvents(contracts: Contract[]) {
         let blockNumber = 0
         let messages: Message[] = []
 
@@ -20,14 +20,15 @@ export class Subscription {
                 address: contract.address
             }
 
-            this._conn.provider.on(filter, async (vLog) => {
-                let ts = await this._conn.getBlockTime(vLog.blockNumber)
+            this.ethConnector.provider.on(filter, async (vLog) => {
+                console.debug(`listening to address ${contract.address}`)
+                let ts = await this.ethConnector.getBlockTime(vLog.blockNumber)
 
                 let msg = contract.parser(vLog, ts)
 
                 messages.push(msg)
                 if (blockNumber != vLog.blockNumber) {
-                    this._conn.connector.produceMessages(MsgType.FCT, messages)
+                    this.ethConnector.connector.produceMessages(MsgType.FCT, messages)
                     blockNumber = vLog.blockNumber
                     messages = []
                 }

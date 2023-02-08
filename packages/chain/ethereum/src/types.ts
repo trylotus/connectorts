@@ -2,6 +2,14 @@ import { ethers } from "ethers"
 import { Interface } from "ethers/lib/utils"
 import * as protobuf from "@bufbuild/protobuf"
 
+export interface CLIConfig {
+    connectorName?: string,
+    blockchainName?: string,
+    fromBlock?: number,
+    numBlocks?: number,
+    help?: boolean,
+}
+
 export class Contract {
     private _ABI: Interface
     private _address: string

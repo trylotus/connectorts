@@ -12,6 +12,7 @@
     "kafkajs": "^2.2.1",
     "prom-client": "^14.1.0",
     "semver": "^7.3.8",
+    "ts-command-line-args": "^2.4.2",
     "ts-node": "^10.9.1",
     "yargs": "^17.6.2"
   },
