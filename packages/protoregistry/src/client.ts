@@ -1,4 +1,5 @@
-import * as http from 'http'
+import { readFileSync } from 'fs';
+import { request } from 'http'
 import { Message } from "@bufbuild/protobuf"
 
 import { MsgType } from "../../kafkautils/src/types"
@@ -9,8 +10,8 @@ type TopicProtoMsg = {
     msg_type: MsgType
     topic: string
     proto_msg: string
-    file_descriptor_proto: Message
-    descriptor: Buffer
+    file_descriptor_proto?: Message
+    descriptor: string
 }
 
 /**
@@ -20,13 +21,13 @@ type TopicProtoMsg = {
  * @param topicTypes topic name to protobuf definition map
  * @param msgType {@link MsgType} kafka message type
  */
-export function registerDynamicTopics(URL: string, topicTypes: TopicTypes, msgType: MsgType): void {
-    let tpmList = buildTopicProtoMsgs(topicTypes, msgType)
+export function registerDynamicTopics(URL: string, topicTypes: TopicTypes, msgType: MsgType, protoDescPath: string): void {
+    let tpmList = buildTopicProtoMsgs(topicTypes, msgType, protoDescPath)
 
     let [host, port] = URL.split(":")
 
     let payload = JSON.stringify(tpmList)
-    let req = http.request({
+    let req = request({
         hostname: host,
         port: port,
         path: '/v1/register',
@@ -55,17 +56,19 @@ export function registerDynamicTopics(URL: string, topicTypes: TopicTypes, msgTy
  * @param msgType {@link MsgType} kafkautils message type
  * @returns array of topic proto messages
  */
-export function buildTopicProtoMsgs(topicTypes: TopicTypes, msgType: MsgType): TopicProtoMsg[] {
+export function buildTopicProtoMsgs(topicTypes: TopicTypes, msgType: MsgType, protoDescPath: string): TopicProtoMsg[] {
     var tpmList = [] as TopicProtoMsg[]
 
-    for (let [k, v] of Object.entries(topicTypes)) {
-        let tpm = {
+    let protoDesc = readFileSync(protoDescPath, 'base64')
+
+    for (let k of Object.keys(topicTypes)) {
+        let tpm: TopicProtoMsg = {
             msg_type: msgType,
             topic: k,
             proto_msg: parseProtoName(k),
-            file_descriptor_proto: v,
-            // descriptor: Buffer.from(v.toBinary())
-        } as TopicProtoMsg
+            // file_descriptor_proto: v,
+            descriptor: protoDesc
+        }
 
         tpmList.push(tpm)
     }
@@ -80,5 +83,6 @@ export function buildTopicProtoMsgs(topicTypes: TopicTypes, msgType: MsgType): T
 function parseProtoName(topic: string): string {
     let t = topic.split(".")
     t.splice(2, 1)
-    return t.join(".").replaceAll("_", ".")
+    return t.slice(2).join(".").replaceAll("_", ".")
 }
+

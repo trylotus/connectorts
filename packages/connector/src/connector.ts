@@ -1,3 +1,4 @@
+import * as path from 'path';
 import * as protobuf from "@bufbuild/protobuf"
 import * as kafka from 'kafkajs'
 import { Mutex } from 'async-mutex';
@@ -10,6 +11,7 @@ import { newProducer } from '../../kafkautils/src/producer'
 import { KafkaMessage } from '../../kafkautils/src/message'
 import { Topic } from '../../kafkautils/src/topic'
 import { TopicTypes, registerDynamicTopics } from '../../protoregistry/src/client'
+import { createDescriptorFiles } from '../../protoregistry/src/proto'
 // import { Monitor } from '../../monitor/src/monitor'
 import { startMonitor } from '../../monitor/src/monitor'
 
@@ -61,6 +63,11 @@ export class Connector {
         if (!c.manifest) {
             throw new Error('missing manifest.yaml')
         }
+
+        //  Create protobuf descriptor files which will later be sent to protoregistry
+        //  ../<project>/cmd/<project_name>
+        let projectPath = path.join(__dirname, '..', '..')
+        createDescriptorFiles(projectPath)
 
         return c
     }
@@ -129,7 +136,7 @@ export class Connector {
      * @param protos protocol buffer definitions
      * @returns 
      */
-    public registerProtos(msgType: MsgType, ...protos: protobuf.Message[]): void {
+    public registerProtos(protoDescPath: string, msgType: MsgType, ...protos: protobuf.Message[]): void {
         if (this.env == Env.DEV) {
             console.log("protoregistry is disabled in dev mode, set kafka.env to other values (e.g., test, staging) to enable it")
             return
@@ -143,7 +150,7 @@ export class Connector {
         }
 
         try {
-            registerDynamicTopics(this.protoRegistryHost, tts, msgType)
+            registerDynamicTopics(this.protoRegistryHost, tts, msgType, protoDescPath)
         } catch (e) {
             console.error("failed to register topics. error: " + e)
         }
