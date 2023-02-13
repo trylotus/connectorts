@@ -64,30 +64,31 @@ export class EthereumConnector {
                 toBlock: toBlock,
             }
 
-            try {
-                let logs = await this.provider.getLogs(filter)
-
-                let blockNumber = 0
-                let messages: Message[] = []
-
-                for (let vLog of logs) {
-                    let ts = await this.getBlockTime(vLog.blockNumber)
-
-                    let msg = contract.parser(vLog, ts)
-
-                    messages.push(msg)
-                    if (blockNumber != vLog.blockNumber) {
-                        this.connector.produceMessages(MsgType.BF, messages)
-                        blockNumber = vLog.blockNumber
-                        messages = []
-                    }
-                }
-            } catch (e) {
+            let logs = await this.provider.getLogs(filter).catch((e) => {
                 console.log(`call failed, retrying after ${backoff / 1000} seconds. error:` + JSON.stringify(e))
-                let mid = (fromBlock + toBlock) / 2
+                let mid = Math.floor((fromBlock + toBlock) / 2)
                 setTimeout(async () => { await this.backfillEvents(contracts, fromBlock, mid, backoff << 1) }, backoff)
-                setTimeout(async () => { await this.backfillEvents(contracts, mid, toBlock, backoff << 1) }, backoff)
+                setTimeout(async () => { await this.backfillEvents(contracts, mid + 1, toBlock, backoff << 1) }, backoff)
                 return
+            })
+
+            if (!logs) continue
+
+            let blockNumber = 0
+            let messages: Message[] = []
+
+            for (let vLog of logs) {
+                let ts = await this.getBlockTime(vLog.blockNumber)
+                let msg = contract.parser(vLog, ts)
+
+                if (blockNumber != vLog.blockNumber) {
+                    console.debug(`${messages.length} message(s) from ${contract.address} at block #${blockNumber}`)
+                    this.connector.produceMessages(MsgType.BF, messages)
+                    blockNumber = vLog.blockNumber
+                    messages = [msg]
+                } else {
+                    messages.push(msg)
+                }
             }
         }
     }

@@ -2,12 +2,17 @@
 
 This README explains in depth how to build a connector for a protocol using Nakji libraries.
 
+
+Project folder tree 
+--project
+--project/smart-contracts
+
 # How to Build a Connector
 
 ## Prerequisites
 
-1. npm v9.1.1
-2. node v18.2.1
+1. npm v9.3.1
+2. node v18.14.0
 3. ts-node v10.9.1
 4. Docker
 5. protoc

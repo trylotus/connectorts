@@ -1,4 +1,3 @@
-import { ethers } from "ethers"
 import { Interface } from "ethers/lib/utils"
 import * as protobuf from "@bufbuild/protobuf"
 
@@ -10,12 +9,20 @@ export interface CLIConfig {
     help?: boolean,
 }
 
+export interface ILog {
+    topics: string[]
+    data: string
+    blockNumber: number
+    logIndex: number
+    transactionHash: string
+}
+
 export class Contract {
     private _ABI: Interface
     private _address: string
-    private _parser: (vLog: ethers.providers.Log, timestamp: number) => protobuf.Message
+    private _parser: (vLog: ILog, timestamp: number) => protobuf.Message
 
-    public constructor(ABI: Interface, address: string, parser: (vLog: ethers.providers.Log, timestamp: number) => protobuf.Message) {
+    public constructor(ABI: Interface, address: string, parser: (vLog: ILog, timestamp: number) => protobuf.Message) {
         this._ABI = ABI
         this._address = address
         this._parser = parser
@@ -29,7 +36,7 @@ export class Contract {
         return this._address
     }
 
-    get parser(): (vLog: ethers.providers.Log, timestamp: number) => protobuf.Message {
+    get parser(): (vLog: ILog, timestamp: number) => protobuf.Message {
         return this._parser
     }
 }

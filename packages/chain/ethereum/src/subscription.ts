@@ -26,11 +26,13 @@ export class Subscription {
 
                 let msg = contract.parser(vLog, ts)
 
-                messages.push(msg)
                 if (blockNumber != vLog.blockNumber) {
+                    console.debug(`${messages.length} message(s) from ${contract.address} at block #${blockNumber}`)
                     this.ethConnector.connector.produceMessages(MsgType.FCT, messages)
                     blockNumber = vLog.blockNumber
-                    messages = []
+                    messages = [msg]
+                } else {
+                    messages.push(msg)
                 }
             })
         }

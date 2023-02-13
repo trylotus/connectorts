@@ -2,7 +2,7 @@
 // This file is a generated protobuf definition and any manual changes will be lost.
 
 syntax = "proto3";
-package nakji.aave.lendingpool;
+package lendingpool;
 
 import "google/protobuf/timestamp.proto";
 option go_package = "github.com/nakji-network/connectorjs/examples/aave/lendingpool";

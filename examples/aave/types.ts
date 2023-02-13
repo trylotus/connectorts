@@ -6,7 +6,9 @@ export var contractAddresses = {
     lendingpool: "0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9"
 }
 
-export const protobufDefinitions: protobuf.Message[] = [
+export const lendingPoolProtoDescPath = './smart-contracts/lendingpool/lendingpool.proto.desc'
+
+export const lendingPoolProtos: protobuf.Message[] = [
     new lp.Borrow({}),
     new lp.Deposit({}),
     new lp.RebalanceStableBorrowRate({}),
