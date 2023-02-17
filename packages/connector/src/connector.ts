@@ -1,4 +1,3 @@
-import * as path from 'path';
 import * as protobuf from "@bufbuild/protobuf"
 import * as kafka from 'kafkajs'
 import { Mutex } from 'async-mutex';
@@ -64,11 +63,6 @@ export class Connector {
             throw new Error('missing manifest.yaml')
         }
 
-        //  Create protobuf descriptor files which will later be sent to protoregistry
-        //  ../<project>/cmd/<project_name>
-        let projectPath = path.join(__dirname, '..', '..')
-        createDescriptorFiles(projectPath)
-
         return c
     }
 
@@ -132,15 +126,19 @@ export class Connector {
 
     /**
      * registerProtos generates kafka topic and protobuf type mappings from proto.Message and registers them dynamically.
+     * @param protoPath path to folder containing .proto file
      * @param msgType kafkautils message type
      * @param protos protocol buffer definitions
      * @returns 
      */
-    public registerProtos(protoDescPath: string, msgType: MsgType, ...protos: protobuf.Message[]): void {
+    public registerProtos(protoPath: string, msgType: MsgType, ...protos: protobuf.Message[]): void {
         if (this.env == Env.DEV) {
             console.log("protoregistry is disabled in dev mode, set kafka.env to other values (e.g., test, staging) to enable it")
             return
         }
+
+        //  Create protobuf descriptor files which will later be sent to protoregistry
+        createDescriptorFiles(protoPath)
 
         let tts: TopicTypes = {}
         for (let proto of protos) {
@@ -150,7 +148,7 @@ export class Connector {
         }
 
         try {
-            registerDynamicTopics(this.protoRegistryHost, tts, msgType, protoDescPath)
+            registerDynamicTopics(this.protoRegistryHost, tts, msgType, protoPath)
         } catch (e) {
             console.error("failed to register topics. error: " + e)
         }
@@ -183,18 +181,26 @@ export class Connector {
         }
 
         let messageBatch: MessageBatch = {}
-        messages.map(msg => {
+
+        for (let msg of messages) {
             let topic = this.generateTopicFromProto(msgType, msg).toString()
-            let kafkaMsg = new KafkaMessage(Buffer.from(msg.toBinary()))
-            if (!messageBatch[topic]) {
-                messageBatch[topic] = {
-                    topic: topic,
-                    messages: [kafkaMsg]
+
+            try {
+                let kafkaMsg = new KafkaMessage(Buffer.from(msg.toBinary()))
+
+                if (!messageBatch[topic]) {
+                    messageBatch[topic] = {
+                        topic: topic,
+                        messages: [kafkaMsg]
+                    }
+                } else {
+                    messageBatch[topic].messages.push(kafkaMsg)
                 }
-            } else {
-                messageBatch[topic].messages.push(kafkaMsg)
+
+            } catch (e) {
+                console.error("failed to create Kafka message. error: " + e)
             }
-        })
+        }
 
         let topicMessages: kafka.TopicMessages[] = Object.values(messageBatch).map((item) => {
             console.debug(`delivered ${item.messages.length} message(s) to topic ${item.topic}`)

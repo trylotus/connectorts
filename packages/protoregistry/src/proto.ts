@@ -7,8 +7,10 @@ export function createDescriptorFiles(dir: string) {
     for (const file of files) {
         if (file.isDirectory()) {
             createDescriptorFiles(join(dir, file.name))
+
         } else {
-            let fileSplit = file.name.split('.')[1]
+
+            let fileSplit = file.name.split('.')
             if (fileSplit.length == 2 && fileSplit[1] == 'proto') {
                 let descPath = join(dir, file.name + ".desc")
                 if (fs.existsSync(descPath)) {

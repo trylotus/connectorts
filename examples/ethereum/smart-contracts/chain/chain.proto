@@ -1,0 +1,33 @@
+syntax = "proto3";
+package chain;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/nakji-network/connectorjs/examples/ethereum/chain";
+
+// to convert addresses from bytes to hex address, https://github.com/ethereum/go-ethereum/blob/4b2ff1457ac28fb2894485194e0e344e84c2bcd7/common/types.go#L210
+message Transaction {
+  google.protobuf.Timestamp ts        = 1;
+  bytes  From                         = 2;
+  string Hash                         = 3;
+  double Size                         = 4;
+  uint64 AccountNonce                 = 5; 
+  uint64 Price                        = 6;
+  uint64 GasLimit                     = 7;
+  bytes  Recipient                    = 8;
+  bytes  Amount                       = 9; 
+  bytes  Payload                      = 10;
+  uint64 V                            = 11; 
+  bytes  R                            = 12;
+  bytes  S                            = 13;
+}
+
+message Block {
+  google.protobuf.Timestamp ts        = 1; 
+  string Hash                         = 2;
+  uint64 Difficulty                   = 3; 
+  uint64 Number                       = 4; 
+  uint64 GasLimit                     = 5; 
+  uint64 GasUsed                      = 6; 
+  uint64 Nonce                        = 7; 
+}
