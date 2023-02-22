@@ -1,7 +1,8 @@
 import { parse } from 'ts-command-line-args';
 
+import { CLIConfig } from "@nakji-network/connectorts/packages/chain/ethereum/src/types"
+
 import { Aave } from '../../aave'
-import { CLIConfig } from "../../../../packages/chain/ethereum/src/types"
 
 const conf = parse<CLIConfig>(
     {

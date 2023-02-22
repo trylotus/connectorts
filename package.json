@@ -1,7 +1,26 @@
 {
+  "author": "nakji",
+  "name": "@nakji-network/connectorts",
+  "version": "0.0.0",
+  "description": "TypeScript library for building blockchain connectors on nakji network.",
+  "homepage": "https://nakji.network",
+  "repository": "https://github.com/nakji-network/connectorts",
+  "bugs": {
+    "url": "https://github.com/nakji-network/connectorts/issues"
+  },
+  "keywords": [
+    "bitcoin",
+    "evm",
+    "ethereum",
+    "blockchain",
+    "nakji",
+    "ethers",
+    "web3"
+  ],
   "dependencies": {
     "@bufbuild/protobuf": "^1.0.0",
     "@bufbuild/protoc-gen-es": "^1.0.0",
+    "@nakji-network/connectorts": "^0.0.0",
     "async-mutex": "^0.4.0",
     "bigint-conversion": "^2.3.0",
     "ethers": "^5.7.2",

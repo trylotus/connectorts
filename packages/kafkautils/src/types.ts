@@ -1,4 +1,4 @@
-import { ConsumerConfig } from 'kafkajs'
+import { ConsumerConfig } from "kafkajs"
 
 export const CONTEXT_SEPARATOR = "."
 export const CONTRACT_SEPARATOR = "_"

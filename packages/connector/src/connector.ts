@@ -11,8 +11,6 @@ import { KafkaMessage } from '../../kafkautils/src/message'
 import { Topic } from '../../kafkautils/src/topic'
 import { TopicTypes, registerDynamicTopics } from '../../protoregistry/src/client'
 import { createDescriptorFiles } from '../../protoregistry/src/proto'
-// import { Monitor } from '../../monitor/src/monitor'
-import { startMonitor } from '../../monitor/src/monitor'
 
 
 
@@ -27,7 +25,6 @@ export class Connector {
 
     private consumer?: kafka.Consumer
     private producer?: kafka.Producer
-    // private monitor?: Monitor
 
     private constructor(config: IConfig, env: Env, kafkaUrl: string, manifest: Manifest, rpcs: any, protoRegistryHost: string) {
         this._config = config
@@ -159,8 +156,6 @@ export class Connector {
      */
     private async startProducer() {
         console.log("initializing kafka producer. transactionID: ", this.id())
-        // this.monitor = await Monitor.startMonitor(this.id())
-        // await startMonitor(this.id())
         this.producer = newProducer(this.kafkaUrl, this.id())
         await this.producer.connect()
     }
@@ -227,9 +222,6 @@ export class Connector {
         }
 
         release()
-
-        // this.monitor?.setMetricsForKafkaLastWriteTime()
-        // await setMetricsForKafkaLastWriteTime()
     }
 
     /**
@@ -239,9 +231,6 @@ export class Connector {
      */
     private async startConsumer(overrideOpts: ConsumerOptions) {
         console.log("initializing kafka producer. groupID: ", this.id())
-        // this.monitor = await Monitor.startMonitor(this.id())
-        await startMonitor(this.id())
-
         this.consumer = newConsumer(this.kafkaUrl, this.id(), overrideOpts)
     }
 

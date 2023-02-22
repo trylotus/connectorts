@@ -10,16 +10,49 @@
 <a href="https://goreportcard.com/report/github.com/nakji-network/connectorjs"><img alt="Typescript Report Card" src="https://goreportcard.com/badge/github.com/nakji-network/connectorjs" /></a>
 </p>
 
-This is a library to help anyone integrate a new data source (aka connector) with [Nakji Network](https://nakji.network).
+# ConnectorTS
 
-The library handles: 
+ConnectorTS allows building connectors running on nakji network using TypeScript. A connector is a piece of software that either extracts blockchain data and transforms them to Protocol Buffer type and pushes them, or directly listens to messages from nakji network. 
 
-- Connector boilerplate
-- Getting configs
-- Publishing and Subscribing to the Nakji message queue
-- Initializing monitoring
-- [Healthcheck support](https://pkg.go.dev/github.com/heptiolabs/healthcheck)
+## Table of Contents
+ 
+- [Getting Started](#getting-started)
+- [Usage](#usage)
+- [Contributing](#contributing)
 
-Connector examples are in [examples/](examples).
+## Getting Started
 
-You can read more documentation on this library in the [Nakji Documentation](https://docs.nakji.network).
+To get started with connectorTS, you can follow these steps:
+
+### Prerequisites
+
+Make sure you have the following software installed on your system:
+
+- Node.js (version 18 or higher)
+- Typescript (version 4 or higher)
+- ts-node (version 10 or higher)
+- protoc (version 3 or higher)
+- buf
+- Docker
+- docker-compose
+
+### Installing
+
+1. Add this library to your project:
+
+`npm -i connectorts`
+
+2. Install the required dependencies:
+
+`npm install`
+
+## Usage
+
+Below you can find source connector examples running on Ethereum.
+
+- [Aave](/examples/aave): Connector for Aave protocol
+- [Ethereum](/examples/ethereum/): Connector for blockchain-specific events such as block data and transactions
+
+## Contributing
+
+Read our [Contribution Guide](CONTRIBUTING.md)
