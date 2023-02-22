@@ -1,7 +1,7 @@
 {
   "author": "nakji",
   "name": "@nakji-network/connectorts",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "TypeScript library for building blockchain connectors on nakji network.",
   "homepage": "https://nakji.network",
   "repository": "https://github.com/nakji-network/connectorts",
