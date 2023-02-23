@@ -19,6 +19,7 @@ ConnectorTS allows building connectors running on nakji network using TypeScript
 - [Getting Started](#getting-started)
 - [Usage](#usage)
 - [Contributing](#contributing)
+- [License](#license)
 
 ## Getting Started
 
@@ -56,3 +57,7 @@ Below you can find source connector examples running on Ethereum.
 ## Contributing
 
 Read our [Contribution Guide](CONTRIBUTING.md)
+
+## License
+
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT) - see the [LICENSE.md](LICENSE.md) file for details.
