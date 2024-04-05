@@ -1,7 +1,7 @@
 import { parse } from 'ts-command-line-args';
 
 import { Ethereum } from '../../ethereum'
-import { CLIConfig } from "@nakji-network/connectorts/packages/chain/ethereum/src/types"
+import { CLIConfig } from '../../../../packages/chain/ethereum/src/types';
 
 const conf = parse<CLIConfig>(
     {
@@ -14,7 +14,7 @@ const conf = parse<CLIConfig>(
     {
         helpArg: 'help',
         headerContentSections: [{ header: 'Etehereum connector', content: 'Aave connector indexes on-chain event logs from Aave protocol.' }],
-        footerContentSections: [{ content: `powered by Nakji Network` }],
+        footerContentSections: [{ content: `powered by Lotus Network` }],
     },
 );
 

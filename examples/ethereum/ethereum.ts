@@ -1,8 +1,8 @@
 import * as protobuf from "@bufbuild/protobuf"
 
-import { EthereumConnector } from "@nakji-network/connectorts/packages/chain/ethereum/src/ethereum";
-import { MsgType } from "@nakji-network/connectorts/packages/kafkautils/src/types"
-import { CLIConfig } from "@nakji-network/connectorts/packages/chain/ethereum/src/types"
+import { EthereumConnector } from "../../packages/chain/ethereum/src/ethereum";
+import { MsgType } from "../../packages/kafkautils/src/types"
+import { CLIConfig } from "../../packages/chain/ethereum/src/types"
 
 import * as chain from "./smart-contracts/chain/chain"
 import * as types from "./types"
@@ -64,7 +64,7 @@ export class Ethereum {
 
 
     private async listenBlocks() {
-        this.ethConnector.provider.on("block", async (blockNumber) => {
+        this.ethConnector.provider.on("block", async (blockNumber: number) => {
             await this.process(blockNumber, MsgType.FCT)
         })
     }

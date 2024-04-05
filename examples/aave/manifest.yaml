@@ -1,7 +1,7 @@
 name: aave
-author: nakji
+author: lotus
 version: "0.0.0"
 
 outputPath: aave
 package: aave
-owner: nakji
+owner: lotus

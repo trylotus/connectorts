@@ -1,27 +1,27 @@
 {
-  "author": "nakji",
-  "name": "@nakji-network/connectorts",
+  "author": "lotus",
+  "name": "@trylotus/connectorts",
   "version": "0.0.2",
-  "description": "TypeScript library for building blockchain connectors on nakji network.",
-  "homepage": "https://nakji.network",
-  "repository": "https://github.com/nakji-network/connectorts",
+  "description": "TypeScript library for building blockchain connectors on lotus.",
+  "homepage": "https://trylotus.xyz",
+  "repository": "https://github.com/trylotus/connectorts",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/nakji-network/connectorts/issues"
+    "url": "https://github.com/trylotus/connectorts/issues"
   },
   "keywords": [
     "bitcoin",
     "evm",
     "ethereum",
     "blockchain",
-    "nakji",
+    "lotus",
     "ethers",
-    "web3"
+    "web3",
+    "subgraph"
   ],
   "dependencies": {
     "@bufbuild/protobuf": "^1.0.0",
     "@bufbuild/protoc-gen-es": "^1.0.0",
-    "@nakji-network/connectorts": "^0.0.0",
     "async-mutex": "^0.4.0",
     "bigint-conversion": "^2.3.0",
     "ethers": "^5.7.2",
@@ -34,7 +34,7 @@
     "prom-client": "^14.1.0",
     "semver": "^7.3.8",
     "ts-command-line-args": "^2.4.2",
-    "ts-node": "^10.9.1",
+    "ts-node": "^10.9.2",
     "yargs": "^17.6.2"
   },
   "engines": {

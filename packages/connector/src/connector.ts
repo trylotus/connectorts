@@ -47,11 +47,11 @@ export class Connector {
 
         let c = new Connector(
             conf,
-            conf.kafka.env,
-            conf.kafka.url,
+            conf.kafka?.env || "dev",
+            conf.kafka?.url || "localhost:9092",
             loadManifest(),
             conf.rpcs,
-            conf.protoregistry.host || "http://localhost:9191"
+            conf.protoregistry?.host || "http://localhost:9191"
         )
 
         this.parseOptions(c, ...options)

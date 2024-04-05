@@ -1,6 +1,6 @@
 # Example Connector
 
-Building a connector on nakji network is easy, yet the libraries can be overwhelming at the beginning. Here we will walk you through how to create a connector in a few easy steps.
+Building a connector on lotus is easy, yet the libraries can be overwhelming at the beginning. Here we will walk you through how to create a connector in a few easy steps.
 
  **It is highly recommended to use example connectors as the template to build your own connector.**
 
@@ -53,7 +53,7 @@ package lendingpool;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/nakji-network/connectorjs/examples/aave/lendingpool";
+option go_package = "github.com/trylotus/connectorts/examples/aave/lendingpool";
 
 message Borrow {
 	google.protobuf.Timestamp ts = 1;
@@ -103,7 +103,7 @@ While still inside `./smart-contract/<contract_name> folder create a `<contract_
 
 5. Create the project-specific files
 
-Now you will create the files to which will contain your connector logic using Nakji connector library. These include all the files in the `<project_name>` directory. You can copy the files from examples as template. 
+Now you will create the files to which will contain your connector logic using Lotus connector library. These include all the files in the `<project_name>` directory. You can copy the files from examples as template. 
 
 * `local.yaml`
 * `manifest.yaml`
@@ -132,14 +132,15 @@ You should now be able to run your connector locally. First, make sure your Dock
 Next, Go to the directory where you have the [docker-compose.yml](docker-compose.yml) file and spin up your environment.
 
 ```shell
-docker-compose up -d
+docker compose up -d
 ```
 
 8. Run connector locally
 
-Now start the connector locally by running the `main.ts` file.
+Now start the connector locally by running the `main.ts` file directly from the connector directory.
 
 ```shell
+cd <connectorname> # eg. cd examples/ethereum
 ts-node cmd/<project_name/main.ts
 ```
 

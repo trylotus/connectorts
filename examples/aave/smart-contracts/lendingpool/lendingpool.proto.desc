@@ -1,134 +1,0 @@
-
-ÿ
-google/protobuf/timestamp.protogoogle.protobuf";
-	Timestamp
-seconds (Rseconds
-nanos (RnanosB…
-com.google.protobufBTimestampProtoPZ2google.golang.org/protobuf/types/known/timestamppbø¢GPBªGoogle.Protobuf.WellKnownTypesbproto3
-„
-lendingpool.protolendingpoolgoogle/protobuf/timestamp.proto"Ô
-Borrow*
-ts (2.google.protobuf.TimestampRts
-reserve (Rreserve
-user (Ruser
-
-onBehalfOf (R
-onBehalfOf
-amount (Ramount&
-borrowRateMode (RborrowRateMode
-
-borrowRate (R
-borrowRate
-referral (Rreferral 
-blockNumber	 (RblockNumber
-logIndex
- (RlogIndex
-txHash (	RtxHash"
-Deposit*
-ts (2.google.protobuf.TimestampRts
-reserve (Rreserve
-user (Ruser
-
-onBehalfOf (R
-onBehalfOf
-amount (Ramount
-referral (Rreferral 
-blockNumber (RblockNumber
-logIndex (RlogIndex
-txHash	 (	RtxHash"Ë
-RebalanceStableBorrowRate*
-ts (2.google.protobuf.TimestampRts
-reserve (Rreserve
-user (Ruser 
-blockNumber (RblockNumber
-logIndex (RlogIndex
-txHash (	RtxHash"Ñ
-ReserveUsedAsCollateralDisabled*
-ts (2.google.protobuf.TimestampRts
-reserve (Rreserve
-user (Ruser 
-blockNumber (RblockNumber
-logIndex (RlogIndex
-txHash (	RtxHash"Ð
-ReserveUsedAsCollateralEnabled*
-ts (2.google.protobuf.TimestampRts
-reserve (Rreserve
-user (Ruser 
-blockNumber (RblockNumber
-logIndex (RlogIndex
-txHash (	RtxHash"â
-Withdraw*
-ts (2.google.protobuf.TimestampRts
-reserve (Rreserve
-user (Ruser
-to (Rto
-amount (Ramount 
-blockNumber (RblockNumber
-logIndex (RlogIndex
-txHash (	RtxHash"Œ
-ReserveDataUpdated*
-ts (2.google.protobuf.TimestampRts
-reserve (Rreserve$
-liquidityRate (RliquidityRate*
-stableBorrowRate (RstableBorrowRate.
-variableBorrowRate (RvariableBorrowRate&
-liquidityIndex (RliquidityIndex0
-variableBorrowIndex (RvariableBorrowIndex 
-blockNumber (RblockNumber
-logIndex	 (RlogIndex
-txHash
- (	RtxHash"Ò
-Swap*
-ts (2.google.protobuf.TimestampRts
-reserve (Rreserve
-user (Ruser
-rateMode (RrateMode 
-blockNumber (RblockNumber
-logIndex (RlogIndex
-txHash (	RtxHash"Œ
-Unpaused*
-ts (2.google.protobuf.TimestampRts 
-blockNumber (RblockNumber
-logIndex (RlogIndex
-txHash (	RtxHash"—
-LiquidationCall*
-ts (2.google.protobuf.TimestampRts(
-collateralAsset (RcollateralAsset
-	debtAsset (R	debtAsset
-user (Ruser 
-debtToCover (RdebtToCover>
-liquidatedCollateralAmount (RliquidatedCollateralAmount
-
-liquidator (R
-liquidator$
-receiveAToken (RreceiveAToken 
-blockNumber	 (RblockNumber
-logIndex
- (RlogIndex
-txHash (	RtxHash"é
-Repay*
-ts (2.google.protobuf.TimestampRts
-reserve (Rreserve
-user (Ruser
-repayer (Rrepayer
-amount (Ramount 
-blockNumber (RblockNumber
-logIndex (RlogIndex
-txHash (	RtxHash"¯
-	FlashLoan*
-ts (2.google.protobuf.TimestampRts
-target (Rtarget
-	initiator (R	initiator
-asset (Rasset
-amount (Ramount
-premium (Rpremium"
-referralCode (RreferralCode 
-blockNumber (RblockNumber
-logIndex	 (RlogIndex
-txHash
- (	RtxHash"Š
-Paused*
-ts (2.google.protobuf.TimestampRts 
-blockNumber (RblockNumber
-logIndex (RlogIndex
-txHash (	RtxHashB@Z>github.com/nakji-network/connectorjs/examples/aave/lendingpoolbproto3

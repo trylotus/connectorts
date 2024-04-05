@@ -1,34 +1,0 @@
-
-ÿ
-google/protobuf/timestamp.protogoogle.protobuf";
-	Timestamp
-seconds (Rseconds
-nanos (RnanosB…
-com.google.protobufBTimestampProtoPZ2google.golang.org/protobuf/types/known/timestamppbø¢GPBªGoogle.Protobuf.WellKnownTypesbproto3
-“
-chain.protochaingoogle/protobuf/timestamp.proto"Å
-Transaction*
-ts (2.google.protobuf.TimestampRts
-From (RFrom
-Hash (	RHash
-Size (RSize"
-AccountNonce (RAccountNonce
-Price (RPrice
-GasLimit (RGasLimit
-	Recipient (R	Recipient
-Amount	 (RAmount
-Payload
- (RPayload
-V (RV
-R (RR
-S (RS"Ë
-Block*
-ts (2.google.protobuf.TimestampRts
-Hash (	RHash
-
-Difficulty (R
-Difficulty
-Number (RNumber
-GasLimit (RGasLimit
-GasUsed (RGasUsed
-Nonce (RNonceB>Z<github.com/nakji-network/connectorjs/examples/ethereum/chainbproto3

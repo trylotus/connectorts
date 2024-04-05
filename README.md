@@ -1,18 +1,16 @@
 <div align="center">
-<a href="https://nakji.network"><img alt="Nakji" src="https://github.com/nakji-network/landing/raw/master/src/images/logo.svg" width="300" /></a>
+<a href="https://trylotus.xyz"><img alt="Lotus" src="https://github.com/trylotus/landing/raw/master/src/images/logo.svg" width="300" /></a>
 <br/>
 <strong></strong>
-<h1>Nakji Connector SDK (Typescript)</h1>
+<h1>Lotus SDK (Typescript)</h1>
 </div>
 <p align="center">
-<a href="https://github.com/nakji-network/connector/actions/workflows/go.yml"><img alt="Github Workflow" src="https://github.com/nakji-network/connector/actions/workflows/go.yml/badge.svg" /></a>
-<a href="https://godoc.org/github.com/nakji-network/connectorjs"><img alt="GoDoc" src="https://godoc.org/github.com/nakji-network/connectorjs?status.svg" /></a>
-<a href="https://goreportcard.com/report/github.com/nakji-network/connectorjs"><img alt="Typescript Report Card" src="https://goreportcard.com/badge/github.com/nakji-network/connectorjs" /></a>
+<!-- Badges -->
 </p>
 
 # ConnectorTS
 
-ConnectorTS allows building connectors running on nakji network using TypeScript. A connector is a piece of software that either extracts blockchain data and transforms them to Protocol Buffer type and pushes them, or directly listens to messages from nakji network. 
+ConnectorTS allows building connectors running on lotus network using TypeScript. A connector is a piece of software that either extracts blockchain data and transforms them to Protocol Buffer type and pushes them, or directly listens to messages from lotus network. 
 
 ## Table of Contents
  
@@ -53,6 +51,10 @@ Below you can find source connector examples running on Ethereum.
 
 - [Aave](/examples/aave): Connector for Aave protocol
 - [Ethereum](/examples/ethereum/): Connector for blockchain-specific events such as block data and transactions
+
+## TODO
+
+[] Clarify protogen in documentation
 
 ## Contributing
 

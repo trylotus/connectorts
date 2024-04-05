@@ -73,15 +73,15 @@ function _init(): void {
     // env vars cannot contain .
     Object.keys(config).map(a => a.replace(".", "_"))
 
-    // Find config.yaml in ./, $CONFIGPATH/nakji/, ~/.config/nakji/, and /etc/nakji/
+    // Find config.yaml in ./, $CONFIGPATH/lotus/, ~/.config/lotus/, and /etc/lotus/
 
     let configPath = process.env.CONFIGPATH || "$HOME/.config"
 
     let paths = [
         ".",
         configPath,
-        configPath + "/nakji",
-        "/etc/nakji",
+        configPath + "/lotus",
+        "/etc/lotus",
     ]
 
     for (let f of paths) {

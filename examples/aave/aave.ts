@@ -1,8 +1,8 @@
 import { utils } from "ethers"
 
-import { MsgType } from "@nakji-network/connectorts/packages/kafkautils/src/types"
-import { CLIConfig, Contract } from "@nakji-network/connectorts/packages/chain/ethereum/src/types"
-import { Subscription } from "@nakji-network/connectorts/packages/chain/ethereum/src/subscription"
+import { MsgType } from "@trylotus/connectorts/packages/kafkautils/src/types"
+import { CLIConfig, Contract } from "@trylotus/connectorts/packages/chain/ethereum/src/types"
+import { Subscription } from "@trylotus/connectorts/packages/chain/ethereum/src/subscription"
 
 import lpABI from "./smart-contracts/lendingpool/lendingpool.abi.json"
 import * as lendingpool from './smart-contracts/lendingpool/lendingpool'

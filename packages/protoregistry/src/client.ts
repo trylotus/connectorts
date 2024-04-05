@@ -82,8 +82,8 @@ export function buildTopicProtoMsgs(topicTypes: TopicTypes, msgType: MsgType, pr
 
 /**
  * 
- * @param topic topic name in the format of e.g. nakji.uniswapv2.0_0_0.liquiditypool_Change
- * @returns proto_msg name in the format of e.g. nakji.uniswapv2.liquiditypool.Change
+ * @param topic topic name in the format of e.g. lotus.uniswapv2.0_0_0.liquiditypool_Change
+ * @returns proto_msg name in the format of e.g. lotus.uniswapv2.liquiditypool.Change
  */
 function parseProtoName(topic: string): string {
     let t = topic.split(".")
