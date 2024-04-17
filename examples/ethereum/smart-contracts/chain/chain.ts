@@ -18,7 +18,7 @@ export function parseTransaction(transaction: TransactionResponse, timestamp: nu
     tx.AccountNonce = BigInt(transaction.nonce)
     tx.Price = transaction.gasPrice!.toBigInt()
     tx.GasLimit = transaction.gasLimit.toBigInt()
-    tx.Recipient = parseInput(InputType.ADDRESS, transaction.to)
+    tx.Recipient = transaction.to ? parseInput(InputType.ADDRESS, transaction.to) : null
     tx.Amount = parseInput(InputType.UINT256, transaction.value)
     tx.Payload = parseInput(InputType.ADDRESS, transaction.data)
     tx.V = BigInt(transaction.v || 0)
